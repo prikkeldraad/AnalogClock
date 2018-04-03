@@ -1,0 +1,110 @@
+<html>
+	<head>
+		<style>
+			#analog {
+				border: 1px solid black;
+			}
+		</style>
+	</head>
+	
+	<body>
+		<canvas id="analog">
+		</canvas>
+
+		<div id="digital">
+		</div>
+		
+		<script type="text/javascript">
+			class Clock {
+				constructor(id, width, height) {
+					if (typeof height === 'undefined') {
+						height = width;
+					}
+					
+					this.id = id;
+					this.canvas = document.getElementById(id);
+					this.context = this.canvas.getContext("2d");
+					this.canvas.width = width;
+					this.canvas.height = height;
+					this.radius = this.canvas.width < this.canvas.height ? this.canvas.width / 2: this.canvas.height / 2
+				}
+				
+				circle(width=1) {
+					this.context.beginPath();
+					this.context.arc(
+						this.canvas.width / 2,
+						this.canvas.height / 2,
+						this.radius,
+						0, 
+						Math.PI*2
+					);
+					
+					this.context.lineWidth=width;
+					this.context.stroke();								
+				}
+				
+				line(x, y, params) {
+					this.context.beginPath();
+					this.context.moveTo(this.canvas.width / 2, this.canvas.height / 2);
+					this.context.lineTo(x, y);
+					this.context.lineWidth = params.width ? params.width : 1;
+					this.context.strokeStyle = params.colour ? params.colour : 'black';
+					this.context.stroke();
+				}
+				
+				// get the x, y points on the circle to draw the hands to
+				point(x, y, r, angle) {
+					return [x + Math.cos(angle) * r, y + Math.sin(angle) * r];
+				}
+				
+				// convert circle of 60 seconds to radian and move back a quarter of a circle,
+				// because radians start at 3 o'clock
+				sec2radian(sec) {
+					return (2 * Math.PI / 60 * sec) - (Math.PI / 2);
+				}
+				
+				// clen canvas to draw next second
+				clean() {
+					this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);				
+				}
+				
+				update() {
+					// show circle again
+					this.circle(2);
+					
+					// get the time and draw the hands
+					var date = new Date();
+					this.draw(date.getSeconds(), {colour: 'red', length: 0.9});
+					this.draw(date.getMinutes(), {width: 2, length: 0.8});
+					this.draw(date.getHours(), {width: 3, length: 0.6});
+				}
+				
+				draw(dt, params) {
+					var angle = this.sec2radian(dt);
+					var point = this.point(
+						this.canvas.width / 2,
+						this.canvas.height / 2,
+						params.length ? params.length * this.radius: this.radius,
+						angle
+					);
+					
+					this.line(point[0], point[1], params);
+				}
+
+				show() {
+					this.clean();
+					this.update();
+					
+					var that = this;
+					setTimeout(function() {
+						that.show();
+					}, 1000);					
+				}				
+			}
+
+			// create a new clock and give id and size
+			let clock = new Clock("analog", 200);
+			clock.show();
+		</script>
+	</body>
+</html>
