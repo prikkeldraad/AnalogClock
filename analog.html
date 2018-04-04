@@ -2,7 +2,7 @@
 	<head>
 		<style>
 			#analog {
-				border: 1px solid black;
+				border: 0px solid black;
 			}
 		</style>
 	</head>
@@ -34,7 +34,7 @@
 					this.context.arc(
 						this.canvas.width / 2,
 						this.canvas.height / 2,
-						this.radius,
+						this.radius - width,
 						0, 
 						Math.PI*2
 					);
@@ -76,7 +76,7 @@
 					var date = new Date();
 					this.draw(date.getSeconds(), {colour: 'red', length: 0.9});
 					this.draw(date.getMinutes(), {width: 2, length: 0.8});
-					this.draw(date.getHours(), {width: 3, length: 0.6});
+					this.draw(date.getHours() * 5, {width: 3, length: 0.6});
 				}
 				
 				draw(dt, params) {
@@ -103,7 +103,7 @@
 			}
 
 			// create a new clock and give id and size
-			let clock = new Clock("analog", 200);
+			let clock = new Clock("analog", 300);
 			clock.show();
 		</script>
 	</body>
